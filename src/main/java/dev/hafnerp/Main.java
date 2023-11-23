@@ -2,27 +2,44 @@ package dev.hafnerp;
 
 import dev.hafnerp.arguments.*;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class Main {
 
     public static void main(String[] args) {
         try {
             List<Argument> arguments = getArgumentListed(args);
-            System.out.println(arguments);
+            System.out.println(arguments+":");
 
             Path directory = Paths.get(".");
-            for (Argument argument : arguments) if (argument.getClass() == Directory.class) directory = Paths.get(((Directory) argument).getContent());
+            String searchedWord = null;
+            boolean first = false;
 
+            for (Argument argument : arguments) {
+                if (argument.getClass() == First.class) first = true;
+                else if (argument.getClass() == Word.class) searchedWord = ((Word) argument).getContent();
+                else if (argument.getClass() == Directory.class) directory = Paths.get(((Directory) argument).getContent());
+            }
+
+            DirectoryStream<Path> dirs = Files.newDirectoryStream(directory);
+            List<Path> foundFiles = searchForFound(dirs, searchedWord, first);
+
+            System.out.println(foundFiles);
         }
-        catch (ParameterNotGiven parameterNotGiven) {
-            parameterNotGiven.getCause();
+        catch (ParameterNotGiven e) {
+            e.printStackTrace();
             //ToDo: Print the Help! (for all commands)
             System.exit(-1);
         }
+        catch (IOException ignore) {}
 
     }
 
@@ -50,5 +67,21 @@ public class Main {
         }
 
         return arguments;
+    }
+
+    private static List<Path> searchForFound(DirectoryStream<Path> stream, String word, boolean first) throws IOException {
+        List<Path> paths = new ArrayList<>();
+        for (Path path : stream) {
+            File file = new File(String.valueOf(path));
+            if (file.isFile()) {
+                Stream<String> stream2 = Files.lines(path);
+                if (stream2.anyMatch(lines -> lines.contains(word))) {
+                    System.out.println("Added Path: "+ path);
+                    paths.add(path);
+                }
+            }
+            else paths.addAll(searchForFound(Files.newDirectoryStream(path), word, first));
+        }
+        return paths;
     }
 }
