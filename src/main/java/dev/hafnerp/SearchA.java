@@ -53,27 +53,27 @@ public class SearchA implements Runnable {
     @Override
     public void run() {
         try {
-            DirectoryStream<Path> direct = Files.newDirectoryStream(directory);
-            for (Path path : direct) {
-                assert path != null;
-                File file = new File(String.valueOf(path));
-                if (file.isDirectory()) {
+            File file = new File(String.valueOf(directory));
+            if (file.isDirectory()) {
+                DirectoryStream<Path> direct = Files.newDirectoryStream(directory);
+                for (Path path : direct) {
                     Runnable r = new SearchA(first, word, path);
                     r.run();
                 }
-                else if (file.isFile()) {
-                    Scanner scanner = new Scanner(file);
-                    boolean found = false;
-                    while (scanner.hasNextLine()) {
-                        String line = scanner.nextLine();
-                        found = (line.contains(word));
-                    }
-                    if (found) {
-                        foundPaths.add(path);
-                        if (first) System.exit(0);
-                    }
-                    scanner.close();
+            }
+            else if (file.isFile()) {
+                Scanner scanner = new Scanner(file);
+                boolean found = false;
+                while (scanner.hasNextLine()) {
+                    String line = scanner.nextLine();
+                    found = (line.contains(word));
+                    if (found) break;
                 }
+                if (found) {
+                    foundPaths.add(directory);
+                    if (first) System.exit(0);
+                }
+                scanner.close();
             }
         }
         catch (Exception e) {
