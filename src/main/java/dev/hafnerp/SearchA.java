@@ -14,11 +14,11 @@ import java.util.Scanner;
  */
 public class SearchA implements Runnable {
 
-    private boolean first = false;
+    private final boolean first;
 
     private final String word;
 
-    private Path directory = null;
+    private final Path directory;
 
     private static final HashSetWrapper<Path> foundPaths = new HashSetWrapper<>();
 
@@ -77,7 +77,7 @@ public class SearchA implements Runnable {
             }
         }
         catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
 
     }
