@@ -2,15 +2,12 @@ package dev.hafnerp;
 
 import dev.hafnerp.arguments.*;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class Main {
 
@@ -29,17 +26,30 @@ public class Main {
                 else if (argument.getClass() == Directory.class) directory = Paths.get(((Directory) argument).getContent());
             }
 
-            DirectoryStream<Path> dirs = Files.newDirectoryStream(directory);
-            List<Path> foundFiles = searchForFound(dirs, searchedWord, first);
+            if (searchedWord != null) {
+                Runnable r = new SearchA(first, searchedWord, directory);
+                r.run();
+            }
+            else {
+                DirectoryStream<Path> files = Files.newDirectoryStream(directory);
+                for (Path path : files) {
+                    System.out.println(String.valueOf(path));
+                    if (first) System.exit(0);
+                }
+            }
 
-            System.out.println(foundFiles);
+
         }
         catch (ParameterNotGiven e) {
-            e.printStackTrace();
-            //ToDo: Print the Help! (for all commands)
+            System.out.println("**********************************************************************************************");
+            System.out.println("* HELP                                                                                       *");
+            System.out.println("* Usage: Main.java [--word \"SEARCHED_WORD\"] [--directory\"SEARCHED_DIRECTORY\"] [--first]      *");
+            System.out.println("**********************************************************************************************");
             System.exit(-1);
         }
-        catch (IOException ignore) {}
+        catch (Exception e) {
+            System.out.println("Out err - "+e.getMessage());
+        }
 
     }
 
@@ -67,21 +77,5 @@ public class Main {
         }
 
         return arguments;
-    }
-
-    private static List<Path> searchForFound(DirectoryStream<Path> stream, String word, boolean first) throws IOException {
-        List<Path> paths = new ArrayList<>();
-        for (Path path : stream) {
-            File file = new File(String.valueOf(path));
-            if (file.isFile()) {
-                Stream<String> stream2 = Files.lines(path);
-                if (stream2.anyMatch(lines -> lines.contains(word))) {
-                    System.out.println("Added Path: "+ path);
-                    paths.add(path);
-                }
-            }
-            else paths.addAll(searchForFound(Files.newDirectoryStream(path), word, first));
-        }
-        return paths;
     }
 }

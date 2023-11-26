@@ -10,24 +10,21 @@ app="dev.hafnerp.Main"
 # Run the program...
 ########################################################################################################################
 
-echo "Executing app with $app as Main class."
 
 if [ $1 == "--test" ]; then
-  echo "Running tests based on the $testDir directory."
+  origin_test_directory=${testDir}/origin
 
-  origin_test_directory_c=$(ls "${testDir}/origin")
+  cd $origin_test_directory || exit
 
-  for fileName in $origin_test_directory_c; do
-    java -classpath "$bin" "$app" "$fileName" &> /dev/null
-    expected="${testDir}/expected/${fileName%.*}.py"
-    err=$(diff $expected test_file.py)
-    if [ $? == 0 ]; then echo -e "\e[1;32m ###################### \e[0m - $fileName - Test successful!"
-    elif [ $? == 1 ]; then echo -e "\e[1;31m ###################### \e[0m - $fileName - Test failed! \n$err"
+  for fileName in *; do
+    out=$(java -classpath "../../$bin" "$app" "$fileName")
+    if [ $? == 0 ]; then echo -e "\e[1;32m ###################### \e[0m - $fileName - Test successful! \n$out"
+    elif [ $? == 1 ]; then echo -e "\e[1;31m ###################### \e[0m - $fileName - Test failed! \n$out"
     fi
   done
 
 elif [ -z $1 ]; then
-  java -classpath $bin $app
+  java -classpath $bin $app --word a
 
   if [ $? == 0 ]; then
     echo -e "\e[1;32m ***OK*** \e[0m app executed successfully!"
