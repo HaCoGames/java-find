@@ -1,6 +1,6 @@
 package dev.hafnerp;
 
-import dev.hafnerp.async.HashSetWrapper;
+import dev.hafnerp.async.ListWrapper;
 
 import java.io.File;
 import java.nio.file.DirectoryStream;
@@ -14,13 +14,13 @@ import java.util.Scanner;
  */
 public class SearchA implements Runnable {
 
-    private boolean first = false;
+    private final boolean first;
 
     private final String word;
 
-    private Path directory = null;
+    private final Path directory;
 
-    private static final HashSetWrapper<Path> foundPaths = new HashSetWrapper<>();
+    private static final ListWrapper<Path> foundPaths = new ListWrapper<>();
 
     public SearchA(boolean first, String word, Path directory) {
         this.first = first;
@@ -47,37 +47,37 @@ public class SearchA implements Runnable {
     }
 
     public static List<Path> getFoundPaths() {
-        return foundPaths.getSet();
+        return foundPaths.getList();
     }
 
     @Override
     public void run() {
         try {
-            DirectoryStream<Path> direct = Files.newDirectoryStream(directory);
-            for (Path path : direct) {
-                assert path != null;
-                File file = new File(String.valueOf(path));
-                if (file.isDirectory()) {
+            File file = new File(String.valueOf(directory));
+            if (file.isDirectory()) {
+                DirectoryStream<Path> direct = Files.newDirectoryStream(directory);
+                for (Path path : direct) {
                     Runnable r = new SearchA(first, word, path);
                     r.run();
                 }
-                else if (file.isFile()) {
-                    Scanner scanner = new Scanner(file);
-                    boolean found = false;
-                    while (scanner.hasNextLine()) {
-                        String line = scanner.nextLine();
-                        found = (line.contains(word));
-                    }
-                    if (found) {
-                        foundPaths.add(path);
-                        if (first) System.exit(0);
-                    }
-                    scanner.close();
+            }
+            else if (file.isFile()) {
+                Scanner scanner = new Scanner(file);
+                boolean found = false;
+                while (scanner.hasNextLine()) {
+                    String line = scanner.nextLine();
+                    found = (line.contains(word));
+                    if (found) break;
                 }
+                if (found) {
+                    foundPaths.add(directory);
+                    if (first) System.exit(0);
+                }
+                scanner.close();
             }
         }
         catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.toString());
         }
 
     }

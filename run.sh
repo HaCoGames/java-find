@@ -11,6 +11,10 @@ app="dev.hafnerp.Main"
 ########################################################################################################################
 
 
+if [ ! -d "./target" ]; then
+  ./build.sh
+fi
+
 if [ $1 == "--test" ]; then
   origin_test_directory=${testDir}/origin
 
@@ -18,13 +22,13 @@ if [ $1 == "--test" ]; then
 
   for fileName in *; do
     out=$(java -classpath "../../$bin" "$app" "$fileName")
-    if [ $? == 0 ]; then echo -e "\e[1;32m ###################### \e[0m - $fileName - Test successful! \n$out"
-    elif [ $? == 1 ]; then echo -e "\e[1;31m ###################### \e[0m - $fileName - Test failed! \n$out"
+    if [ $? == 0 ]; then echo -e "\e[1;32m ###################### \e[0m - \"$fileName\" - Test successful!"
+    elif [ $? == 1 ]; then echo -e "\e[1;31m ###################### \e[0m - \"$fileName\" - Test failed!"
     fi
   done
 
 elif [ -z $1 ]; then
-  java -classpath $bin $app --word a
+  java -classpath $bin $app --word "if" --first
 
   if [ $? == 0 ]; then
     echo -e "\e[1;32m ***OK*** \e[0m app executed successfully!"
