@@ -1,2 +1,2 @@
 # java-find
-An implementation of in Java.
+An implementation of find in Java.
