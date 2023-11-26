@@ -4,10 +4,46 @@
 #Date: 2023/11/22
 
 
-mvn compile
+src=./src/main/java
+bin=./target/classes
+lib=../lib
+doc=../doc
+
+mvn compile &> /dev/null
 
 if [ $? == 0 ]; then
-  echo -e "\e[1;32mSUCCESS\e[0m - The build was successful."
+  echo -e "\e[1;32m ***OK*** \e[0m The build was successful."
 else
-  echo -e "\e[1;31mFAILED\e[0m - The build was not successful"
+  echo -e "\e[1;31m ***ERR*** \e[0m The build was not successful"
+fi
+
+########################################################################################################################
+# Building the .jar file!
+########################################################################################################################
+
+jarFile="${lib}/compiler.jar"
+
+jar -cvf $jarFile -C $bin . &> /dev/null
+
+if [ $? == 0 ]; then
+  echo -e "\e[1;32m ***OK*** \e[0m jar file build successfully!"
+else
+  echo -e "\e[1;31m ***ERR*** \e[0m jar file NOT build successfully"
+fi
+
+########################################################################################################################
+# Building the Documentation!
+########################################################################################################################
+
+# Documentation Path -->
+docmodelpath="${doc}/java-find"
+sources="${src}/dev/hafnerp/*.java"
+
+# Generating the documentation
+javadoc -d $docmodelpath --source-path $src ${sources} &> /dev/null
+
+if [ $? == 0 ]; then
+  echo -e "\e[1;32m ***OK*** \e[0m documentation generated successfully in '$docmodelpath'!"
+else
+  echo -e "\e[1;31m ***ERR*** \e[0m documentation generated NOT successfully in '$docmodelpath'!"
 fi

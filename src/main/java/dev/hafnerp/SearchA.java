@@ -1,6 +1,6 @@
 package dev.hafnerp;
 
-import dev.hafnerp.async.HashSetWrapper;
+import dev.hafnerp.async.ListWrapper;
 
 import java.io.File;
 import java.nio.file.DirectoryStream;
@@ -20,7 +20,7 @@ public class SearchA implements Runnable {
 
     private final Path directory;
 
-    private static final HashSetWrapper<Path> foundPaths = new HashSetWrapper<>();
+    private static final ListWrapper<Path> foundPaths = new ListWrapper<>();
 
     public SearchA(boolean first, String word, Path directory) {
         this.first = first;
@@ -47,7 +47,7 @@ public class SearchA implements Runnable {
     }
 
     public static List<Path> getFoundPaths() {
-        return foundPaths.getSet();
+        return foundPaths.getList();
     }
 
     @Override
