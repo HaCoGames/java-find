@@ -20,9 +20,12 @@ public class SearchA implements Runnable {
 
     private final Path directory;
 
+    private static int instanceCounter = 0;
+
     private static final ListWrapper<Path> foundPaths = new ListWrapper<>();
 
     public SearchA(boolean first, String word, Path directory) {
+        instanceCounter++;
         this.first = first;
         this.word = word;
         this.directory = directory;
@@ -50,6 +53,10 @@ public class SearchA implements Runnable {
         return foundPaths.getList();
     }
 
+    public static int getInstanceCounter() {
+        return instanceCounter;
+    }
+
     @Override
     public void run() {
         try {
@@ -59,6 +66,7 @@ public class SearchA implements Runnable {
                 for (Path path : direct) {
                     Runnable r = new SearchA(first, word, path);
                     r.run();
+                    System.gc();
                 }
             }
             else if (file.isFile()) {
@@ -80,5 +88,13 @@ public class SearchA implements Runnable {
             System.out.println(e.toString());
         }
 
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        if (--instanceCounter <= 0 && foundPaths.getList().isEmpty()) {
+            System.exit(2);
+        }
     }
 }
