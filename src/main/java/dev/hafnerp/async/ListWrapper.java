@@ -7,16 +7,26 @@ import java.util.List;
 public class ListWrapper<Type> {
     private List<Type> list;
 
+    private static boolean found;
+
     public ListWrapper() {
         this.list = new LinkedList<>();
     }
 
-    public void add(Type element) {
+    public synchronized void add(Type element) {
         list.add(element);
         System.out.println(element);
     }
 
-    public List<Type> getList() {
+    public synchronized void setFound(boolean found) {
+        ListWrapper.found = found;
+    }
+
+    public synchronized boolean isFound() {
+        return found;
+    }
+
+    public synchronized List<Type> getList() {
         return new ArrayList<>(list);
     }
 }

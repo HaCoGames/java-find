@@ -64,22 +64,23 @@ public class SearchA implements Runnable {
             if (file.isDirectory()) {
                 DirectoryStream<Path> direct = Files.newDirectoryStream(directory);
                 for (Path path : direct) {
-                    Runnable r = new SearchA(first, word, path);
-                    r.run();
+                    Thread th = new Thread(new SearchA(first, word, path));
+                    th.start();
+                    th.join();
+                    if (foundPaths.isFound()) break;
                     System.gc();
                 }
             }
             else if (file.isFile()) {
                 Scanner scanner = new Scanner(file);
                 boolean found = false;
-                while (scanner.hasNextLine()) {
+                while (scanner.hasNextLine() && !found) {
                     String line = scanner.nextLine();
                     found = (line.contains(word));
-                    if (found) break;
                 }
                 if (found) {
                     foundPaths.add(directory);
-                    if (first) System.exit(0);
+                    if (first) foundPaths.setFound(true);
                 }
                 scanner.close();
             }

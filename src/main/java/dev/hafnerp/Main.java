@@ -27,8 +27,9 @@ public class Main {
             }
 
             if (searchedWord != null) {
-                Runnable r = new SearchA(first, searchedWord, directory);
-                r.run();
+                Thread thread = new Thread(new SearchA(first, searchedWord, directory));
+                thread.start();
+                thread.join();
             }
             else {
                 DirectoryStream<Path> files = Files.newDirectoryStream(directory);
