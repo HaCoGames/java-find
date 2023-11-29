@@ -16,16 +16,30 @@ if [ ! -d "./target" ]; then
 fi
 
 if [ $1 == "--test" ]; then
-  origin_test_directory=${testDir}/origin
+  java -classpath "$bin" "$app" --first &> /dev/null
+  if [ $? == 0 ]; then echo -e "\e[1;32m ###################### \e[0m - \"--first\" - Test successful!"
+  elif [ $? == 1 ]; then echo -e "\e[1;31m ###################### \e[0m - \--first\" - Test failed!"
+  fi
 
-  cd $origin_test_directory || exit
+  java -classpath "$bin" "$app" --first --word "if" &> /dev/null
+  if [ $? == 0 ]; then echo -e "\e[1;32m ###################### \e[0m - \"--first --word if\" - Test successful!"
+  elif [ $? == 1 ]; then echo -e "\e[1;31m ###################### \e[0m - \"--first --word if\" - Test failed!"
+  fi
 
-  for fileName in *; do
-    out=$(java -classpath "../../$bin" "$app" "$fileName")
-    if [ $? == 0 ]; then echo -e "\e[1;32m ###################### \e[0m - \"$fileName\" - Test successful!"
-    elif [ $? == 1 ]; then echo -e "\e[1;31m ###################### \e[0m - \"$fileName\" - Test failed!"
-    fi
-  done
+  java -classpath "$bin" "$app" --first --word &> /dev/null
+  if [ $? == 255 ]; then echo -e "\e[1;32m ###################### \e[0m - \"--first --word\" - Test successful!"
+  elif [ $? == 1 ]; then echo -e "\e[1;31m ###################### \e[0m - \"--first --word\" - Test failed!"
+  fi
+
+  java -classpath "$bin" "$app" --first --directory &> /dev/null
+  if [ $? == 255 ]; then echo -e "\e[1;32m ###################### \e[0m - \"-first --directory\" - Test successful!"
+  elif [ $? == 1 ]; then echo -e "\e[1;31m ###################### \e[0m - \"-first --directory\" - Test failed!"
+  fi
+
+  java -classpath "$bin" "$app" --first --directory ./ &> /dev/null
+  if [ $? == 0 ]; then echo -e "\e[1;32m ###################### \e[0m - \"--first --directory ./\" - Test successful!"
+  elif [ $? == 1 ]; then echo -e "\e[1;31m ###################### \e[0m - \"--first --directory ./\" - Test failed!"
+  fi
 
 elif [ -z $1 ]; then
   java -classpath $bin $app --word "if" --first

@@ -1,6 +1,7 @@
 package dev.hafnerp;
 
 import dev.hafnerp.arguments.*;
+import dev.hafnerp.async.ListWrapper;
 
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -12,6 +13,7 @@ import java.util.List;
 public class Main {
 
     public static void main(String[] args) {
+        int exitCode = 0;
         try {
             List<Argument> arguments = getArgumentListed(args);
             System.out.println(arguments+":");
@@ -30,6 +32,7 @@ public class Main {
                 Thread thread = new Thread(new SearchA(first, searchedWord, directory));
                 thread.start();
                 thread.join();
+                if (ListWrapper.getPathInstance().getList().isEmpty()) exitCode = 2;
             }
             else {
                 DirectoryStream<Path> files = Files.newDirectoryStream(directory);
@@ -38,7 +41,7 @@ public class Main {
                     if (first) System.exit(0);
                 }
             }
-
+            System.out.println(ListWrapper.getPathInstance());
 
         }
         catch (ParameterNotGiven e) {
@@ -46,12 +49,13 @@ public class Main {
             System.out.println("* HELP                                                                                       *");
             System.out.println("* Usage: Main.java [--word \"SEARCHED_WORD\"] [--directory\"SEARCHED_DIRECTORY\"] [--first]      *");
             System.out.println("**********************************************************************************************");
-            System.exit(-1);
+            exitCode = -1;
         }
         catch (Exception e) {
             System.out.println("Out err - "+e.getMessage());
+            exitCode = 1;
         }
-
+        System.exit(exitCode);
     }
 
     private static List<Argument> getArgumentListed(String[] args) throws ParameterNotGiven {

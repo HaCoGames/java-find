@@ -1,21 +1,29 @@
 package dev.hafnerp.async;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 public class ListWrapper<Type> {
-    private List<Type> list;
+    private final List<Type> list;
 
     private static boolean found;
+
+    private static ListWrapper<?> listWrapper;
 
     public ListWrapper() {
         this.list = new LinkedList<>();
     }
 
+    public static synchronized ListWrapper<Path> getPathInstance() {
+        if (listWrapper == null) listWrapper = new ListWrapper<Path>();
+        return (ListWrapper<Path>) listWrapper;
+    }
+
     public synchronized void add(Type element) {
         list.add(element);
-        System.out.println(element);
     }
 
     public synchronized void setFound(boolean found) {
@@ -28,5 +36,12 @@ public class ListWrapper<Type> {
 
     public synchronized List<Type> getList() {
         return new ArrayList<>(list);
+    }
+
+    public String toString() {
+        StringBuilder ret = new StringBuilder();
+        int elementCounter = 0;
+        for (Type element : list) ret.append(elementCounter++ < 1 ? "" : "\n").append(element.toString());
+        return ret.toString();
     }
 }

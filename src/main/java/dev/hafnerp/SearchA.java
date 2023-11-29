@@ -22,7 +22,7 @@ public class SearchA implements Runnable {
 
     private static int instanceCounter = 0;
 
-    private static final ListWrapper<Path> foundPaths = new ListWrapper<>();
+    private static final ListWrapper<Path> foundPaths = ListWrapper.getPathInstance();
 
     public SearchA(boolean first, String word, Path directory) {
         instanceCounter++;
