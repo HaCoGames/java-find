@@ -22,6 +22,8 @@ public class SearchA implements Runnable {
 
     private static final ListWrapper<Path> foundPaths = ListWrapper.getPathInstance();
 
+    private static int instanceCounter = 0;
+
     public SearchA(boolean first, String word, Path directory) {
         instanceCounter++;
         this.first = first;
