@@ -64,10 +64,10 @@ public class SearchA implements Runnable {
             if (file.isDirectory()) {
                 DirectoryStream<Path> direct = Files.newDirectoryStream(directory);
                 for (Path path : direct) {
+                    if (foundPaths.isFound()) break;
                     Thread th = new Thread(new SearchA(first, word, path));
                     th.start();
-                    th.join();
-                    if (foundPaths.isFound()) break;
+                    //th.join();
                     System.gc();
                 }
             }
