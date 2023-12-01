@@ -20,8 +20,6 @@ public class SearchA implements Runnable {
 
     private final Path directory;
 
-    private static int instanceCounter = 0;
-
     private static final ListWrapper<Path> foundPaths = ListWrapper.getPathInstance();
 
     public SearchA(boolean first, String word, Path directory) {
@@ -86,6 +84,7 @@ public class SearchA implements Runnable {
             }
         }
         catch (Exception e) {
+            System.out.println(e.toString());
             System.out.println(e.toString());
         }
 
