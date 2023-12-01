@@ -20,8 +20,6 @@ public class SearchA implements Runnable {
 
     private final Path directory;
 
-    private static int instanceCounter = 0;
-
     private static final ListWrapper<Path> foundPaths = ListWrapper.getPathInstance();
 
     public SearchA(boolean first, String word, Path directory) {
@@ -64,10 +62,10 @@ public class SearchA implements Runnable {
             if (file.isDirectory()) {
                 DirectoryStream<Path> direct = Files.newDirectoryStream(directory);
                 for (Path path : direct) {
+                    if (foundPaths.isFound()) break;
                     Thread th = new Thread(new SearchA(first, word, path));
                     th.start();
-                    th.join();
-                    if (foundPaths.isFound()) break;
+                    //th.join();
                     System.gc();
                 }
             }
@@ -86,6 +84,7 @@ public class SearchA implements Runnable {
             }
         }
         catch (Exception e) {
+            System.out.println(e.toString());
             System.out.println(e.toString());
         }
 
