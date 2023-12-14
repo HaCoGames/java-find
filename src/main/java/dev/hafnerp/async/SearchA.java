@@ -1,11 +1,10 @@
-package dev.hafnerp;
-
-import dev.hafnerp.async.ListWrapper;
+package dev.hafnerp.async;
 
 import java.io.File;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -22,6 +21,10 @@ public class SearchA implements Runnable {
 
     private static final ListWrapper<Path> foundPaths = ListWrapper.getPathInstance();
 
+    private ArrayList<Thread> allChildThreads;
+
+    private ArrayList<SearchA> allChildRunnable;
+
     private static int instanceCounter = 0;
 
     public SearchA(boolean first, String word, Path directory) {
@@ -29,12 +32,16 @@ public class SearchA implements Runnable {
         this.first = first;
         this.word = word;
         this.directory = directory;
+        allChildThreads = new ArrayList<>();
+        allChildRunnable = new ArrayList<>();
     }
 
     public SearchA(String word, Path directory) {
         this.first = false;
         this.word = word;
         this.directory = directory;
+        allChildThreads = new ArrayList<>();
+        allChildRunnable = new ArrayList<>();
     }
 
     public boolean isFirst() {
@@ -57,6 +64,14 @@ public class SearchA implements Runnable {
         return instanceCounter;
     }
 
+    public ArrayList<SearchA> getAllChildRunnable() {
+        return new ArrayList<>(allChildRunnable);
+    }
+
+    public ArrayList<Thread> getAllChildThreads() {
+        return new ArrayList<>(allChildThreads);
+    }
+
     @Override
     public void run() {
         try {
@@ -65,10 +80,17 @@ public class SearchA implements Runnable {
                 DirectoryStream<Path> direct = Files.newDirectoryStream(directory);
                 for (Path path : direct) {
                     if (foundPaths.isFound()) break;
-                    Thread th = new Thread(new SearchA(first, word, path));
+                    SearchA runnable;
+                    Thread th;
+
+                    runnable = new SearchA(first, word, path);
+                    th = new Thread(runnable);
+
+                    allChildThreads.add(th);
+                    allChildRunnable.add(runnable);
+
                     th.start();
-                    //th.join();
-                    System.gc();
+                    th.join();
                 }
             }
             else if (file.isFile()) {
@@ -90,6 +112,25 @@ public class SearchA implements Runnable {
             System.out.println(e.toString());
         }
 
+    }
+
+    public static void interruptThreads(ArrayList<Thread> threads, ArrayList<SearchA> runnableS) {
+        threads.forEach(SearchA::interruptThread);
+        runnableS.forEach(SearchA::interruptRunnableThreads);
+    }
+
+    /**
+     * This function interrupts a Thread
+     * @param aThread A thread that should be interrupted.
+     */
+    private static void interruptThread(Thread aThread) {
+        System.out.println("SearchA - interrupt thread "+aThread.getName());
+        aThread.interrupt();
+    }
+
+    private static void interruptRunnableThreads(SearchA searchA) {
+        System.out.println("SearchA - interrupting all the threads in runnable "+ searchA);
+        interruptThreads(searchA.getAllChildThreads(), searchA.getAllChildRunnable());
     }
 
     @Override
