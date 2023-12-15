@@ -11,6 +11,44 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/*
+ * @startuml doc-files/Main.png
+ * class Main {
+ *      void main();
+ * }
+ *
+ * class SearchA {
+ *      boolean first
+ *      String word
+ *      Path directory
+ *      void run();
+ *      List getFoundPaths();
+ *      ArrayList getAllChildRunnable();
+ *      ArrayList getAllChildThreads();
+ * }
+ *
+ * class ListWrapper {
+ *      void add();
+ *      List<?> getList()
+ *      String toString();
+ * }
+ *
+ * Main "1" -- "1" SearchA : > runs new Thread
+ * SearchA "1" -- "*" SearchA : > is parent thread of new thread
+ * ListWrapper "1" -- "*" SearchA : < adds the found paths
+ * ListWrapper "1" -- "*" SearchA : < check if a path was found
+ * ListWrapper "1" -- "1" Main : < reads found paths
+ * @enduml
+ */
+
+/**
+ *  Hello!
+ *  This is a project for an implementation of the shell command find written in Java with the extra functionality to
+ *  search for a specific word; You will get the paths to every file with the given word.
+ *  <p>DATA:<img src="doc-files/Main.png"></p>
+ */
+
 public class Main {
 
     public static void main(String[] args) {

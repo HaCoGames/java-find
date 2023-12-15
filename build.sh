@@ -37,10 +37,11 @@ fi
 
 # Documentation Path -->
 docmodelpath="${doc}/java-find"
-sources="${src}/dev/hafnerp/*.java"
 
+
+java -jar ~/bin/plantuml/plantuml.jar $src/dev/hafnerp/Main.java
 # Generating the documentation
-javadoc -d $docmodelpath --source-path $src ${sources} &> /dev/null
+javadoc -d $docmodelpath -subpackages dev.hafnerp --source-path $src --class-path $bin:$lib &> /dev/null
 
 if [ $? == 0 ]; then
   echo -e "\e[1;32m ***OK*** \e[0m documentation generated successfully in '$docmodelpath'!"
